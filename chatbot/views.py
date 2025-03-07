@@ -18,7 +18,7 @@ class ChatbotAPIView(APIView):
             """
             
             question = serializer.validated_data['question']
-            additional_info = serializer.validated_data.get('additionalinfo', {})
+            additional_info = serializer.validated_data.get('additional_info', {})
             
             message = [{"role": "system", "content": prompt}]
             

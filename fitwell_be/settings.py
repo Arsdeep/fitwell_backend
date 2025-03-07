@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-@aleifqf(0f2ym_de3hu1pvqrktur-#j&(m=cw4lg5czgb!(r+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['electric-florence-wolfey-6aed61ff.koyeb.app']
+ALLOWED_HOSTS = ['electric-florence-wolfey-6aed61ff.koyeb.app', 'localhost', '127.0.0.1']
 
 
 # Application definition
