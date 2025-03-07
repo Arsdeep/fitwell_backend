@@ -13,6 +13,7 @@ idna==3.10
 jiter==0.8.2
 openai==1.65.4
 packaging==24.2
+pillow==11.1.0
 pydantic==2.10.6
 pydantic_core==2.27.2
 python-dotenv==1.0.1
