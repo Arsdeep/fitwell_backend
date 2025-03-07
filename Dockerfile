@@ -19,5 +19,5 @@ COPY . /app/
 # Expose the application port
 EXPOSE 8000
 
-# Run database migrations and start the Django server
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+# Run database migrations and start the Django server# Run database migrations and start the Django server
+ENTRYPOINT ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
