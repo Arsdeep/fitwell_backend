@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ImageUploadSerializer
+from json import JSONDecodeError, loads
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)  # Initialize OpenAI client
 
@@ -16,23 +17,44 @@ class FoodCalorieAPIView(APIView):
             
             # Encode the image in Base64
             base64_image = base64.b64encode(image.read()).decode("utf-8")
+            
+            prompt = "Your job is to Analyze the given image and identify all food items present. Provide a structured JSON response containing the number of detected food items, their names, and an estimated calorie count for each. Format the response as follows:\n\n"
+            
+            structure = """{
+                "foods": [
+                    {
+                    "name": "<food_name>",
+                    "count": "<estimated_count>"
+                    "calories": "<estimated_calories>"
+                    },
+                    {
+                    "name": "<food_name>",
+                    "count": "<estimated_count>"
+                    "calories": "<estimated_calories>"
+                    }
+                ]
+                }
+                """
+            
+            prompt += structure
 
             # Send request to OpenAI Vision API
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
                     {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": "Identify the food items in this image and estimate their calorie content."},
-                            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}},
-                        ],
+                        "role": "user","content": [{"type": "text", "text": prompt},{"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}],
                     }
                 ],
+                response_format={"type": "json_object"},
             )
 
             # Extract response
             answer = response.choices[0].message.content
-            return Response({"calories_info": answer}, status=status.HTTP_200_OK)
+            try:
+                answer = loads(answer)
+                return Response({"calories_info": answer}, status=status.HTTP_200_OK)
+            except JSONDecodeError:
+                return {"error": "Roadmap content is not a valid JSON."}
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
