@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import ImageUploadSerializer
+from .serializers import ImageUploadSerializer, FoodSearchSerializer
 from json import JSONDecodeError, loads
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)  # Initialize OpenAI client
@@ -46,6 +46,56 @@ class FoodCalorieAPIView(APIView):
                         "role": "user","content": [{"type": "text", "text": prompt},{"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}],
                     }
                 ],
+                response_format={"type": "json_object"},
+            )
+
+            # Extract response
+            answer = response.choices[0].message.content
+            try:
+                answer = loads(answer)
+                return Response({"calories_info": answer}, status=status.HTTP_200_OK)
+            except JSONDecodeError:
+                return {"error": "Roadmap content is not a valid JSON."}
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FoodSearchAPIView(APIView):
+    def post(self, request):
+        serializer = FoodSearchSerializer(data=request.data)
+        if serializer.is_valid():
+            query = serializer.validated_data['query']
+            
+            prompt = "Your job is to provide a broad list of dishes related to the food item or dish itself based on the given food item/dish name. Provide a structured JSON response containing the dish name, the amount of calories+protien+carbs+fat it has. Format the response as follows:\n\n"
+            
+            structure = """{
+                "foods": [
+                    {
+                    "name": "<food_name>",
+                    "calories": "<estimated_calories>",
+                    "protien": "<estimated_protien>",
+                    "carbs": "<estimated_carbs>",
+                    "fat": "<estimated_fat>"
+                    },
+                    {
+                    "name": "<food_name>",]
+                    "calories": "<estimated_calories>",
+                    "protien": "<estimated_protien>",
+                    "carbs": "<estimated_carbs>",
+                    "fat": "<estimated_fat>"
+                    }
+                ]
+                }
+                """
+            
+            prompt += structure
+            
+            message = [{"role": "system", "content": prompt}]
+                
+            message += [{"role": "user", "content": f"Query of Food item/dish is - {query}"}]
+            
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=message,
                 response_format={"type": "json_object"},
             )
 
