@@ -18,7 +18,7 @@ class FoodCalorieAPIView(APIView):
             # Encode the image in Base64
             base64_image = base64.b64encode(image.read()).decode("utf-8")
             
-            prompt = "Your job is to Analyze the given image and identify all food items present. Provide a structured JSON response containing the number of detected food items, their names, and an estimated calorie+protien+carbs+fat count for each. Format the response as follows:\n\n"
+            prompt = "Your job is to Analyze the given image and identify all food items present. Provide a structured JSON response containing the number of detected food items, their names, and an estimated calorie+protien+carbs+fat count for each. Also add serving size detail in count. Format the response as follows:\n\n"
             
             structure = """{
                 "foods": [
