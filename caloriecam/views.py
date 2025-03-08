@@ -71,12 +71,12 @@ class FoodSearchAPIView(APIView):
         if serializer.is_valid():
             query = serializer.validated_data['query']
             
-            prompt = "Your job is to provide a list of 3 dishes related to the food item or dish itself based on the given food item/dish name. Provide a structured JSON response containing the dish name, the amount of calories+protien+carbs+fat it has. Format the response as follows:\n\n"
+            prompt = "Your job is to provide details of the given food item and also a list of 2 other dishes related to the food item. Provide a structured JSON response containing the ingredient and dish names, the amount of calories+protien+carbs+fat it has. Format the response as follows:\n\n"
             
             structure = """{
                 "foods": [
                     {
-                    "name": "<food_name>",
+                    "name": "<ingredient_name>",
                     "count": "<estimated_count>"
                     "calories": "<estimated_calories>",
                     "protien": "<estimated_protien>",
@@ -84,7 +84,15 @@ class FoodSearchAPIView(APIView):
                     "fat": "<estimated_fat>"
                     },
                     {
-                    "name": "<food_name>",]
+                    "name": "<dish_name>",]
+                    "count": "<estimated_count>"
+                    "calories": "<estimated_calories>",
+                    "protien": "<estimated_protien>",
+                    "carbs": "<estimated_carbs>",
+                    "fat": "<estimated_fat>"
+                    },
+                    {
+                    "name": "<dish_name>",]
                     "count": "<estimated_count>"
                     "calories": "<estimated_calories>",
                     "protien": "<estimated_protien>",
