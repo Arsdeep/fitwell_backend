@@ -23,6 +23,12 @@ class ChatbotAPIView(APIView):
             
             message = [{"role": "system", "content": prompt}]
             
+            if serializer.validated_data['prev_question']:
+                message = [{"role": "user", "content": serializer.validated_data['prev_question']}]
+                
+            if serializer.validated_data['prev_answer']:
+                message = [{"role": "system", "content": serializer.validated_data['prev_answer']}]
+                
             if additional_info != {}:
                 message += [{"role": "system", "content": f"Additional Details of User : {additional_info}"}]
                 
