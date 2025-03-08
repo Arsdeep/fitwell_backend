@@ -77,6 +77,7 @@ class FoodSearchAPIView(APIView):
                 "foods": [
                     {
                     "name": "<food_name>",
+                    "count": "<estimated_count>"
                     "calories": "<estimated_calories>",
                     "protien": "<estimated_protien>",
                     "carbs": "<estimated_carbs>",
@@ -84,6 +85,7 @@ class FoodSearchAPIView(APIView):
                     },
                     {
                     "name": "<food_name>",]
+                    "count": "<estimated_count>"
                     "calories": "<estimated_calories>",
                     "protien": "<estimated_protien>",
                     "carbs": "<estimated_carbs>",
