@@ -14,11 +14,10 @@ class DietPlanAPIView(APIView):
     def post(self, request):
         serializer = DietPlanSerializer(data=request.data)
         if serializer.is_valid():
-            user_id = serializer.validated_data['user_id']
             additional_info = serializer.validated_data['additional_info']
 
             # Check if cached response exists
-            cached_plan = cache.get(f'diet_plan_{user_id}')
+            cached_plan = cache.get(f'diet_plan_{additional_info.uid}')
             if cached_plan:
                 return Response({"diet_plan": cached_plan}, status=status.HTTP_200_OK)
 
@@ -88,7 +87,7 @@ class DietPlanAPIView(APIView):
             try:
                 answer = loads(response.choices[0].message.content)
                 # Cache the response for future requests
-                cache.set(f'diet_plan_{user_id}', answer, timeout=86400)  # Cache for 1 day
+                cache.set(f'diet_plan_{additional_info.uid}', answer, timeout=86400)  # Cache for 1 day
                 return Response({"diet_plan": answer}, status=status.HTTP_200_OK)
             except JSONDecodeError:
                 return Response({"error": "Generated diet plan is not a valid JSON."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
