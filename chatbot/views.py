@@ -4,8 +4,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ChatbotSerializer
+import re
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)  # Initialize OpenAI client
+
+def process_string(s):
+    matches = re.findall(r"<actionTrue=(\d+)>", s)
+    total_calories = sum(map(int, matches))
+    cleaned_string = re.sub(r"<actionTrue=\d+>", "", s)
+    return total_calories, cleaned_string.strip()
 
 class ChatbotAPIView(APIView):
     def post(self, request):
@@ -13,9 +20,10 @@ class ChatbotAPIView(APIView):
         if serializer.is_valid():
             
             prompt = f"""
-            You are FitWell AI assistant, a knowledgeable wellness and fitness chatbot. Provide helpful and accurate answers to user queries about health, fitness, and well-being.
+            You are FitWell AI assistant, a knowledgeable wellness and fitness chatbot. Provide helpful and accurate answers to user queries about health, fitness, and well-being in short and concise manner.
             Give advice leaning towards fixing the user's diet if the user asks any queries about diseases or issues in their lives.
-            Consider the user's background information if provided in additional details when answering. 
+            Consider the user's background information if provided in additional details when answering.
+            If user mentions any calorie burning activity, answer that the calories had been substracted, after that calculate the total calories burnt and add it at the end of the answer like - <actionTrue=calories_burnt>, dont add anything else.
             """
             
             question = serializer.validated_data['question']
@@ -38,8 +46,11 @@ class ChatbotAPIView(APIView):
                 model="gpt-4o-mini",
                 messages=message,
             )
-
+            
             answer = completion.choices[0].message.content
-            return Response({"answer": answer}, status=status.HTTP_200_OK)
+            
+            calories, answer = process_string(answer)
+
+            return Response({"answer": answer, "calories_burnt": calories}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
