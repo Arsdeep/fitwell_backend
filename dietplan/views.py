@@ -22,7 +22,7 @@ class DietPlanAPIView(APIView):
                 return Response({"diet_plan": cached_plan}, status=status.HTTP_200_OK)
 
             # Generate diet plan if not in cache
-            prompt = """Your job is to make a balanced diet while keeping in mind user details given below. Provide a structured JSON response containing the ingredient and dish names, the amount of calories, protein, carbs, and fat. Format the response as follows:\n\n"""
+            prompt = """Your job is to make a balanced diet while keeping in mind user details given below. Add local dishes catered to the user's nationality. Provide a structured JSON response containing the ingredient and dish names, the amount of calories, protein, carbs, and fat. Format the response as follows:\n\n"""
             
             structure = """{
   "breakfast": {

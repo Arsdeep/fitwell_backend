@@ -23,19 +23,23 @@ class ChatbotAPIView(APIView):
             You are FitWell AI assistant, a knowledgeable wellness and fitness chatbot. Provide helpful and accurate answers to user queries about health, fitness, and well-being in short and concise manner.
             Give advice leaning towards fixing the user's diet if the user asks any queries about diseases or issues in their lives.
             Consider the user's background information if provided in additional details when answering.
-            If user mentions any calorie burning activity, answer that the calories had been substracted, after that calculate the total calories burnt and add it at the end of the answer like - <actionTrue=calories_burnt>, where calories_burnt is the total amount of actual calories burnt, dont add anything else.
             """
+            
+            prompt2 = """
+            If user mentions any calorie burning activity, answer that the calories had been substracted
+            
+            For actually substracting the calories, I must get the total calculated burnt calories, you must add it at the end of the answer in a format like this - '<actionTrue=calories_burnt>', where calories_burnt is the total amount of actual calories burnt, dont add anything else."""
             
             question = serializer.validated_data['question']
             additional_info = serializer.validated_data.get('additional_info', {})
             
-            message = [{"role": "system", "content": prompt}]
+            message = [{"role": "system", "content": prompt + prompt2}]
             
             if serializer.validated_data['prev_question']:
-                message = [{"role": "user", "content": serializer.validated_data['prev_question']}]
+                message += [{"role": "user", "content": serializer.validated_data['prev_question']}]
                 
             if serializer.validated_data['prev_answer']:
-                message = [{"role": "system", "content": serializer.validated_data['prev_answer']}]
+                message += [{"role": "system", "content": serializer.validated_data['prev_answer']}]
                 
             if additional_info != {}:
                 message += [{"role": "system", "content": f"Additional Details of User : {additional_info}"}]
